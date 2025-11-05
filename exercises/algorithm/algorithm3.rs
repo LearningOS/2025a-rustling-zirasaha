@@ -3,11 +3,53 @@
 	This problem requires you to implement a sorting algorithm
 	you can use bubble sorting, insertion sorting, heap sorting, etc.
 */
-// I AM NOT DONE
 
-fn sort<T>(array: &mut [T]){
+fn sort<T: PartialOrd + Copy>(array: &mut [T]){
 	//TODO
+    let len = array.len();
+    if len <= 1 {
+        return;
+    }
+
+    let mid = len / 2;
+
+    let mut temp_left = Vec::with_capacity(mid);
+    temp_left.extend_from_slice(&array[..mid]);
+
+    let temp_right = &mut array[mid..];
+
+    sort(&mut temp_left);
+    sort(temp_right);
+
+    let merge_list = merge(&temp_left, temp_right);
+    array.copy_from_slice(&merge_list);
 }
+
+fn merge<T: PartialOrd + Copy>(left_sorted: &[T], right_sorted: &[T]) -> Vec<T> {
+    let mut result = Vec::with_capacity(left_sorted.len() + right_sorted.len());
+
+    let mut i = 0;
+    let mut j = 0;
+
+    while i < left_sorted.len() && j < right_sorted.len() {
+        if left_sorted[i] <= right_sorted[j] {
+            result.push(left_sorted[i]);
+            i += 1;
+        } else {
+            result.push(right_sorted[j]);
+            j += 1;
+        }
+    }
+
+    if i < left_sorted.len() {
+        result.extend_from_slice(&left_sorted[i..]);
+    }
+    if j < right_sorted.len() {
+        result.extend_from_slice(&right_sorted[j..]);
+    }
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
